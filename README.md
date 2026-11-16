@@ -25,11 +25,16 @@ No exploit code is used. Everything runs in Docker on localhost.
 index=main source="/logs/*" ((method=POST (req_len>1000000 OR status=413)) OR "Allowed memory size")
 | eval signal=if(searchmatch("Allowed memory size"), "php_out_of_memory", "oversized_post")
 | stats count by signal
+Status: the search is written and the two log signals were checked by hand in the lab. It has not been run in Splunk against this lab yet.
 ```
 
 ## Screenshots
 
-(add: version before, Splunk search results, 413 after the stopgap, version after)
+![Exposed on 8.3.35](01-version-before.png)
+
+![Stopgaps applied: 413 and PHP settings](02-stopgaps.png)
+
+![Patched on 8.3.36](03-version-after.png)
 
 ## Limits
 
