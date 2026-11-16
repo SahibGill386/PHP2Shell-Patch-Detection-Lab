@@ -1,0 +1,14 @@
+; STOPGAP 2: PHP settings from the PHP advisory for servers that cannot patch yet.
+; Rename this file to zz-mitigations.ini in step 5, then: docker compose restart php
+; These are partial. They do not replace the update.
+
+; closes the session upload-progress path (CVE-2026-109619)
+session.upload_progress.enabled = 0
+
+; small request bodies (8M when the site takes no uploads)
+post_max_size = 8M
+upload_max_filesize = 4M
+
+; removes the memory-limit failure the first bug depends on (CVE-2026-109618).
+; Only safe because the container has its own memory cap (mem_limit in compose).
+memory_limit = -1

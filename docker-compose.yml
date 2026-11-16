@@ -1,0 +1,33 @@
+services:
+  php:
+    image: php:${PHP_TAG}
+    volumes:
+      - ./app:/var/www/html
+      - ./php:/usr/local/etc/php/conf.d/lab:ro
+    environment:
+      PHP_INI_SCAN_DIR: "/usr/local/etc/php/conf.d:/usr/local/etc/php/conf.d/lab"
+    mem_limit: 512m          # container memory cap (needed if memory_limit = -1)
+
+  nginx:
+    image: nginx:stable
+    ports:
+      - "127.0.0.1:8080:80"  # localhost only, never exposed to the network
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./app:/var/www/html:ro
+      - ./logs:/var/log/nginx
+    depends_on:
+      - php
+
+  # Only starts with: docker compose --profile splunk up -d
+  splunk:
+    image: splunk/splunk:latest
+    profiles: ["splunk"]
+    environment:
+      SPLUNK_GENERAL_TERMS: "--accept-sgt-current-at-splunk-com"
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_PASSWORD: "ChangeMe-Lab123"
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ./logs:/logs:ro
